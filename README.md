@@ -14,4 +14,7 @@ Keep in mind that this plugin will delete all current wishlist member levels.
 
 ### Extra
 
-Plugin layout based on hlashbrooke's Plugin Template: https://github.com/hlashbrooke/WordPress-Plugin-Template/
+* If you end up having problems deleting levels, I've found that deleting the option_name of "wpm_levels" in wp_wlm_options works
+* Plugin layout based on hlashbrooke's Plugin Template: https://github.com/hlashbrooke/WordPress-Plugin-Template/
+
+
