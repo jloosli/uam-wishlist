@@ -2,10 +2,10 @@
 /*
  * Plugin Name: User Access Manager to Wishlist Plugin
  * Version: 1.0
- * Plugin URI: http://www.hughlashbrooke.com/
- * Description: This is your starter template for your next WordPress plugin.
- * Author: Hugh Lashbrooke
- * Author URI: http://www.hughlashbrooke.com/
+ * Plugin URI: https://github.com/jloosli/uam-wishlist
+ * Description: User Access Manager -> Wishlist converter
+ * Author: Jared Loosli
+ * Author URI: https://github.com/jloosli/
  * Requires at least: 4.0
  * Tested up to: 4.0
  *
@@ -13,7 +13,7 @@
  * Domain Path: /lang/
  *
  * @package WordPress
- * @author Hugh Lashbrooke
+ * @author Jared Loosli
  * @since 1.0.0
  */
 
