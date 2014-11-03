@@ -122,41 +122,43 @@ class UAM_Wishlist {
 	} // End __construct ()
 
 	public function run() {
-		echo "<pre>\n";
-//		echo "Members:\n";
-//		print_r($this->getMembers());
-		echo "Deleting Levels\n";
+		echo "<h1>DELETING LEVELS</h1>\n";
+		echo "<pre>";
 		$this->deleteLevels();
-		echo "Creating groups\n";
+		echo "</pre><h1>CREATING GROUPS</h1><pre>\n";
 		$groups = $this->createGroups();
-		echo "Matching groups\n";
-		$this->matchGroups($groups);
-		echo "Completed\n";
-		ob_end_flush();
+		print_r($groups);
+		echo "</pre><h1>MATCHING GROUPS</h1><pre>\n";
+		print_r($this->matchGroups($groups));
+		echo "</pre><h1>Completed</h1>";
 		die;
 	}
 
 	function matchGroups($groups) {
+		$results = [];
 
-		echo "The New Groups:\n";
-		print_r($groups);
 		foreach ( $groups as $g ) {
+			$result = [];
 
 			$wishlist_id = $g['wishlist']['level']['id'];
-			echo "Adding wishlist id $wishlist_id\n";
+			$wishlist_name = $g['wishlist']['level']['name'];
+			$result['name'] = $wishlist_name;
+			echo "Adding wishlist id $wishlist_id $wishlist_name\n";
 			$pages       = array_keys( $this->getObjects( 'page', $g['uam']->ID ) );
 			$posts       = array_keys( $this->getObjects( 'post', $g['uam']->ID ) );
 			$users       = array_keys( $this->getObjects( 'user', $g['uam']->ID ) );
 			$categories  = array_keys( $this->getObjects( 'category', $g['uam']->ID ) );
-			$this->addPosts( $wishlist_id, $pages );
+			$result['pages'] = $this->addPosts( $wishlist_id, $pages );
 			$this->protect('page',$pages);
-			$this->addPosts( $wishlist_id, $posts );
+			$result['posts'] = $this->addPosts( $wishlist_id, $posts );
 			$this->protect('post',$posts);
-			$this->addUsers( $wishlist_id, $users );
-			$this->addCategories( $wishlist_id, $categories );
+			$result['users'] = $this->addUsers( $wishlist_id, $users );
+			$result['categories'] = $this->addCategories( $wishlist_id, $categories );
 			$this->protect('category',$categories);
-			error_log("Adding wishlist id $wishlist_id\n");
+			error_log("Adding details to wishlist level $wishlist_id $wishlist_name\n");
+			$results[]=$result;
 		}
+		return $results;
 	}
 
 	function getMembers() {
@@ -166,7 +168,9 @@ class UAM_Wishlist {
 
 
 	function deleteLevels() {
+		$results = [];
 		$levels = wlmapi_the_levels();
+		$results['levels'] = $levels;
 		foreach ( $levels['levels']['level'] as $level ) {
 			echo "Level:\n";
 			print_r( $level );
@@ -174,10 +178,10 @@ class UAM_Wishlist {
 			$members = wlmapi_the_level_members($level['id']);
 			print_r($members);
 			foreach($members['members']['member'] as $member) {
-				echo "Removing {$member["user_login"]}\n";
+				echo "Removing {$member["user_login"]}<br>\n";
 				wlmapi_remove_member_from_level( $level['id'], $member['id'] );
 			}
-			echo "Deleting level id: {$level['id']}\n";
+			echo "Deleting level id: {$level['id']}<br>\n";
 			$delete = wlmapi_delete_level( $level['id'] );
 			if(!$delete['success']) {
 				print_r($delete);
@@ -207,8 +211,6 @@ class UAM_Wishlist {
 	// Create Groups
 	function createGroup( $args ) {
 		$level = wlmapi_create_level( $args );
-		print_r( $level );
-
 		return $level;
 	}
 
