@@ -4,6 +4,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class UAM_Wishlist {
 
+	private $api;
+
 	/**
 	 * The single instance of UAM_Wishlist.
 	 * @var 	object
@@ -86,7 +88,10 @@ class UAM_Wishlist {
 	 */
 	public function __construct ( $file = '', $version = '1.0.0' ) {
 		$this->_version = $version;
-		$this->_token = 'uAM_Wishlist';
+		$this->_token = 'UAM_Wishlist';
+		require_once(__DIR__.'/../../wishlist-member/core/api-helper/class-api-methods.php');
+		$api_methods = new WLMAPIMethods();
+		$this->api = $api_methods->loadAPI();
 
 		// Load plugin environment variables
 		$this->file = $file;
@@ -148,9 +153,9 @@ class UAM_Wishlist {
 			$posts       = array_keys( $this->getObjects( 'post', $g['uam']->ID ) );
 			$users       = array_keys( $this->getObjects( 'user', $g['uam']->ID ) );
 			$categories  = array_keys( $this->getObjects( 'category', $g['uam']->ID ) );
-			$result['pages'] = $this->addPosts( $wishlist_id, $pages );
+			$result['pages'] = $this->addContent('page', $wishlist_id, $pages );
 			$this->protect('page',$pages);
-			$result['posts'] = $this->addPosts( $wishlist_id, $posts );
+			$result['posts'] = $this->addContent('post', $wishlist_id, $posts );
 			$this->protect('post',$posts);
 			$result['users'] = $this->addUsers( $wishlist_id, $users );
 			$result['categories'] = $this->addCategories( $wishlist_id, $categories );
@@ -192,7 +197,9 @@ class UAM_Wishlist {
 
 	function addUsers( $group_id, $user_ids ) {
 		$args    = array( 'Users' => $user_ids );
-		$members = wlmapi_add_member_to_level( $group_id, $args );
+//		$members = wlmapi_add_member_to_level( $group_id, $args );
+		$response = $this->api->post("/levels/$group_id/members/", $args);
+		$members = unserialize($response);
 		echo $group_id . "\n";
 		print_r( $members );
 
@@ -234,8 +241,16 @@ class UAM_Wishlist {
 		return $wpdb->get_results( $sql, OBJECT_K );
 	}
 
-	function addPosts( $level_id, $post_ids = [ ] ) {
-		$posts = wlmapi_manage_post( $level_id, $post_ids );
+	function addContent($content_type, $level_id, $post_ids = [ ] ) {
+		$func = "wlmapi_add_{$content_type}_to_level";
+		$args  = array('ContentIds'=>$post_ids);
+		$posts = $func( $level_id, $args );
+//		if(count($posts[$content_type.'s'][$content_type]) !== count($post_ids)) {
+//			echo "PROBLEM!\n";
+//			print_r($post_ids);
+//			print_r($posts);
+//			die("{$content_type} counts didn't match: ".count($post_ids));
+//		}
 
 		return $posts;
 	}
