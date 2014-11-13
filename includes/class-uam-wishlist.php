@@ -132,13 +132,14 @@ class UAM_Wishlist {
         echo "<h1>DELETING LEVELS</h1>\n";
         echo "<pre>";
         $this->deleteLevels();
+        echo "<h1>Current Levels</h1>";
+        print_r(wlmapi_the_levels());
         echo "</pre><h1>CREATING GROUPS</h1><pre>\n";
         $groups = $this->createGroups();
         print_r( $groups );
         echo "</pre><h1>MATCHING GROUPS</h1><pre>\n";
         print_r( $this->matchGroups( $groups ) );
         echo "</pre><h1>Completed</h1>";
-        die;
     }
 
     function matchGroups( $groups ) {
@@ -257,6 +258,12 @@ class UAM_Wishlist {
                 }
             }
             $g        = $this->createGroup( $args );
+            if($g['success'] === 0) {
+                var_dump($grp);
+                var_dump($g);
+                wp_ob_end_flush_all();
+                die('Couldn\'t create group.');
+            }
             $groups[] = [ 'uam' => $grp, 'wishlist' => $g ];
         }
 
@@ -274,8 +281,8 @@ class UAM_Wishlist {
     function addContent( $content_type, $level_id, $post_ids = [ ] ) {
         $func  = "wlmapi_add_{$content_type}_to_level";
         $args  = array( 'ContentIds' => $post_ids );
-//        $posts = $func( $level_id, $args );
-        $posts = $func( $level_id, $post_ids );
+        $posts = $func( $level_id, $args );
+//        $posts = $func( $level_id, $post_ids );
 //		if(count($posts[$content_type.'s'][$content_type]) !== count($post_ids)) {
 //			echo "PROBLEM!\n";
 //			print_r($post_ids);
