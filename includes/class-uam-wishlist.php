@@ -274,7 +274,8 @@ class UAM_Wishlist {
     function addContent( $content_type, $level_id, $post_ids = [ ] ) {
         $func  = "wlmapi_add_{$content_type}_to_level";
         $args  = array( 'ContentIds' => $post_ids );
-        $posts = $func( $level_id, $args );
+//        $posts = $func( $level_id, $args );
+        $posts = $func( $level_id, $post_ids );
 //		if(count($posts[$content_type.'s'][$content_type]) !== count($post_ids)) {
 //			echo "PROBLEM!\n";
 //			print_r($post_ids);
